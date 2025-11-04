@@ -17,16 +17,16 @@ class PDFQAAgent:
         """Process a question and return an answer using RAG pipeline."""
 
         try:
-            # 1️⃣ Embed the query
+            # 1️. Embed the query
             query_embedding = get_query_embedding(query)
 
-            # 2️⃣ Retrieve relevant document chunks
+            # 2️. Retrieve relevant document chunks
             relevant_chunks = self.faiss_store.search(query_embedding, k=k)
 
             if not relevant_chunks:
                 return "I couldn't find any relevant context in the document."
 
-            # 3️⃣ Construct context and prompts
+            # 3️. Construct context and prompts
             context = "\n\n".join([
                 chunk["text"] if isinstance(chunk, dict) and "text" in chunk else str(chunk)
                 for chunk in relevant_chunks])
@@ -50,7 +50,7 @@ Question: {query}
 
 Answer:"""
 
-            # 4️⃣ Generate response from Ollama
+            # 4️. Generate response from Ollama
             response = await llm_client.generate(prompt=prompt, system_prompt=system_prompt)
 
             if not response or len(response.strip()) == 0:
@@ -59,4 +59,4 @@ Answer:"""
             return response.strip()
 
         except Exception as e:
-            return f"⚠️ Error: {str(e)}. Ensure Ollama is running via 'ollama serve' and a model like 'llama3' is pulled."
+            return f" Error: {str(e)}. Ensure Ollama is running via 'ollama serve' and a model is pulled."
